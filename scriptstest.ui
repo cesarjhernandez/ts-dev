@@ -1,0 +1,1259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ScriptsTest</class>
+ <widget class="QWidget" name="ScriptsTest">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>807</width>
+    <height>1363</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>2</pointsize>
+   </font>
+  </property>
+  <property name="cursor">
+   <cursorShape>ArrowCursor</cursorShape>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::NoFocus</enum>
+  </property>
+  <property name="windowTitle">
+   <string>Thermostat-Dev</string>
+  </property>
+  <property name="windowOpacity">
+   <double>50.000000000000000</double>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(243, 243, 243);</string>
+  </property>
+  <widget class="QPushButton" name="pushButtonHeat">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>70</y>
+     <width>81</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ubuntu</family>
+     <pointsize>5</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton::pressed {
+background-color: rgb(239,56,233); border: none;
+color: white;
+}
+
+QPushButton {
+background-color: rgb(224, 224, 224); border: none;
+}
+
+QPushButton:font {
+color: rgb(0, 0, 0);
+}</string>
+   </property>
+   <property name="text">
+    <string>HEAT</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonCool">
+   <property name="geometry">
+    <rect>
+     <x>510</x>
+     <y>70</y>
+     <width>81</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ubuntu</family>
+     <pointsize>5</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton::pressed {
+background-color: rgb(239,56,233); border: none;
+color: white;
+}
+
+QPushButton {
+background-color: rgb(224, 224, 224); border: none;
+}
+
+QPushButton:font {
+color: rgb(0, 0, 0);
+}</string>
+   </property>
+   <property name="text">
+    <string>COOL</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonAuto">
+   <property name="geometry">
+    <rect>
+     <x>610</x>
+     <y>70</y>
+     <width>81</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ubuntu</family>
+     <pointsize>5</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton::pressed {
+background-color: rgb(239,56,233); border: none;
+color: white;
+}
+
+QPushButton {
+background-color: rgb(224, 224, 224); border: none;
+}
+
+QPushButton:font {
+color: rgb(0, 0, 0);
+}</string>
+   </property>
+   <property name="text">
+    <string>AUTO</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonOff">
+   <property name="geometry">
+    <rect>
+     <x>710</x>
+     <y>70</y>
+     <width>81</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ubuntu</family>
+     <pointsize>5</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="mouseTracking">
+    <bool>true</bool>
+   </property>
+   <property name="tabletTracking">
+    <bool>true</bool>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+background-color: rgb(224, 224, 224); border: none;
+}
+
+QPushButton::pressed { 
+background-color: rgb(239,56,233); border: none;
+color: white;
+}</string>
+   </property>
+   <property name="text">
+    <string>OFF</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelTemperature">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>60</y>
+     <width>64</width>
+     <height>64</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../../Pictures/qtcreator-images/temperature.svg</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelHeating">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>60</y>
+     <width>64</width>
+     <height>64</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../../Pictures/qtcreator-images/heating.svg</pixmap>
+   </property>
+  </widget>
+  <widget class="Line" name="line">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>130</y>
+     <width>291</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="Line" name="line_2">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>130</y>
+     <width>471</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelHvac">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>131</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ubuntu</family>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="tabletTracking">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: gray;</string>
+   </property>
+   <property name="text">
+    <string>HVAC</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelFanOn">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>170</y>
+     <width>64</width>
+     <height>64</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../../Pictures/qtcreator-images/flow.svg</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelSwitch">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>230</y>
+     <width>64</width>
+     <height>64</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../../Pictures/qtcreator-images/switch.svg</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelTextTemp">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>70</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ubuntu</family>
+     <pointsize>4</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="tabletTracking">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Temperature</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelTextFanOn">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>180</y>
+     <width>41</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ubuntu</family>
+     <pointsize>4</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="tabletTracking">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Fan</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="exitSlot">
+   <property name="geometry">
+    <rect>
+     <x>638</x>
+     <y>1154</y>
+     <width>111</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonFanOn">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>170</y>
+     <width>81</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ubuntu</family>
+     <pointsize>5</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton::pressed {
+background-color: rgb(239,56,233); border: none;
+color: white;
+}
+
+QPushButton {
+background-color: rgb(224, 224, 224); border: none;
+}
+
+QPushButton:font {
+color: rgb(0, 0, 0);
+}</string>
+   </property>
+   <property name="text">
+    <string>ON</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonFanAuto">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>170</y>
+     <width>81</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ubuntu</family>
+     <pointsize>5</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton::pressed {
+background-color: rgb(239,56,233); border: none;
+color: white;
+}
+
+QPushButton {
+background-color: rgb(224, 224, 224); border: none;
+}
+
+QPushButton:font {
+color: rgb(0, 0, 0);
+}</string>
+   </property>
+   <property name="text">
+    <string>AUTO</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelTempSlider">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>650</y>
+     <width>121</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ubuntu</family>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="tabletTracking">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: gray;</string>
+   </property>
+   <property name="text">
+    <string>AUTO</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>240</y>
+     <width>151</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ubuntu</family>
+     <pointsize>5</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="mouseTracking">
+    <bool>true</bool>
+   </property>
+   <property name="tabletTracking">
+    <bool>true</bool>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::StrongFocus</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton
+{
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0 8px;
+  background: #FF2E2E;
+}
+
+QPushButton::pressed { 
+background-color: rgb(0, 204, 0); border: none;
+color: white;
+padding: 0 8px;
+border-radius: 10px
+}</string>
+   </property>
+   <property name="text">
+    <string>Connect</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelMac">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>1080</y>
+     <width>301</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>BlankCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="deviceShowLabel">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>1150</y>
+     <width>301</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>BlankCursor</cursorShape>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="tempLabel">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>60</y>
+     <width>121</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>7</pointsize>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>BlankCursor</cursorShape>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLabel {
+background-color: rgba(0,0,0,0%);
+border: none;
+color: gray;
+}
+
+QLabel:font {
+color: rgb(0, 0, 0);
+background-color: gray;
+}</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelSwitchOff">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>230</y>
+     <width>64</width>
+     <height>64</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../../Pictures/qtcreator-images/switch2.svg</pixmap>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="tempSpinBox">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>731</y>
+     <width>81</width>
+     <height>48</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>5</pointsize>
+    </font>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="tempSpinBox_3">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>730</y>
+     <width>81</width>
+     <height>48</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>64</width>
+     <height>48</height>
+    </size>
+   </property>
+   <property name="baseSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>5</pointsize>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelLightOff">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>280</y>
+     <width>41</width>
+     <height>64</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../../Pictures/qtcreator-images/lightoff.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelLightOn">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>280</y>
+     <width>41</width>
+     <height>64</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../../Pictures/qtcreator-images/lighton.png</pixmap>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelTextLight">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>300</y>
+     <width>41</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ubuntu</family>
+     <pointsize>4</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="tabletTracking">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Light</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>360</y>
+     <width>781</width>
+     <height>261</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0" colspan="3">
+     <widget class="QLabel" name="labelGpioStatus">
+      <property name="font">
+       <font>
+        <family>Ubuntu</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="tabletTracking">
+       <bool>false</bool>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: gray;</string>
+      </property>
+      <property name="text">
+       <string>GPIO Status</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="labelHeatPin">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../Pictures/qtcreator-images/text.svg</pixmap>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLabel" name="labelTextHeat">
+      <property name="font">
+       <font>
+        <family>Ubuntu</family>
+        <pointsize>4</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="tabletTracking">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Heat Pin</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QLabel" name="labelTextHeat_2">
+      <property name="font">
+       <font>
+        <family>Ubuntu</family>
+        <pointsize>4</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="tabletTracking">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>OFF</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="3">
+     <widget class="QLabel" name="labelCoolPin">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../Pictures/qtcreator-images/text.svg</pixmap>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="4">
+     <widget class="QLabel" name="labelTextCool">
+      <property name="font">
+       <font>
+        <family>Ubuntu</family>
+        <pointsize>4</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="tabletTracking">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Cool Pin</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="5">
+     <widget class="QLabel" name="labelTextCool_2">
+      <property name="font">
+       <font>
+        <family>Ubuntu</family>
+        <pointsize>4</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="tabletTracking">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>OFF</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="3">
+     <widget class="Line" name="line_3">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="3" colspan="3">
+     <widget class="Line" name="line_4">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="labelFanPin">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>../../../Pictures/qtcreator-images/text.svg</pixmap>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLabel" name="labelTextFan">
+      <property name="font">
+       <font>
+        <family>Ubuntu</family>
+        <pointsize>4</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="tabletTracking">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Fan Pin</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QLabel" name="labelTextFan_2">
+      <property name="font">
+       <font>
+        <family>Ubuntu</family>
+        <pointsize>4</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="tabletTracking">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>OFF</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QLabel" name="labelTextTemp_2">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>750</y>
+     <width>241</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ubuntu</family>
+     <pointsize>4</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="tabletTracking">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Temperature Setpoint ( °C )</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::AutoText</enum>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelSwitchAuto">
+   <property name="geometry">
+    <rect>
+     <x>4</x>
+     <y>726</y>
+     <width>61</width>
+     <height>64</height>
+    </rect>
+   </property>
+   <property name="sizeIncrement">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../../Pictures/qtcreator-images/temperature.svg</pixmap>
+   </property>
+  </widget>
+  <widget class="QSlider" name="tempSlider">
+   <property name="geometry">
+    <rect>
+     <x>161</x>
+     <y>750</y>
+     <width>241</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelSwitchAuto_2">
+   <property name="geometry">
+    <rect>
+     <x>404</x>
+     <y>726</y>
+     <width>61</width>
+     <height>64</height>
+    </rect>
+   </property>
+   <property name="sizeIncrement">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="pixmap">
+    <pixmap>../../../Pictures/qtcreator-images/temperature.svg</pixmap>
+   </property>
+  </widget>
+  <widget class="QSlider" name="tempSlider_2">
+   <property name="geometry">
+    <rect>
+     <x>555</x>
+     <y>750</y>
+     <width>241</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="tempSpinBox_2">
+   <property name="geometry">
+    <rect>
+     <x>69</x>
+     <y>730</y>
+     <width>81</width>
+     <height>48</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>64</width>
+     <height>48</height>
+    </size>
+   </property>
+   <property name="baseSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>5</pointsize>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="tabletTracking">
+    <bool>true</bool>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::NoFocus</enum>
+   </property>
+   <property name="contextMenuPolicy">
+    <enum>Qt::DefaultContextMenu</enum>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonLight">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>300</y>
+     <width>64</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton
+{
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0 8px;
+}</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>64</width>
+     <height>24</height>
+    </size>
+   </property>
+  </widget>
+  <zorder>labelTextTemp_2</zorder>
+  <zorder>labelSwitchAuto</zorder>
+  <zorder>tempSlider</zorder>
+  <zorder>labelSwitchAuto_2</zorder>
+  <zorder>tempSlider_2</zorder>
+  <zorder>tempSpinBox_2</zorder>
+  <zorder>labelLightOn</zorder>
+  <zorder>layoutWidget</zorder>
+  <zorder>pushButtonHeat</zorder>
+  <zorder>pushButtonCool</zorder>
+  <zorder>pushButtonAuto</zorder>
+  <zorder>pushButtonOff</zorder>
+  <zorder>labelTemperature</zorder>
+  <zorder>labelHeating</zorder>
+  <zorder>line</zorder>
+  <zorder>line_2</zorder>
+  <zorder>labelHvac</zorder>
+  <zorder>labelFanOn</zorder>
+  <zorder>labelSwitch</zorder>
+  <zorder>labelTextTemp</zorder>
+  <zorder>labelTextFanOn</zorder>
+  <zorder>exitSlot</zorder>
+  <zorder>pushButtonFanOn</zorder>
+  <zorder>pushButtonFanAuto</zorder>
+  <zorder>labelTempSlider</zorder>
+  <zorder>pushButton</zorder>
+  <zorder>labelMac</zorder>
+  <zorder>deviceShowLabel</zorder>
+  <zorder>tempLabel</zorder>
+  <zorder>labelSwitchOff</zorder>
+  <zorder>tempSpinBox</zorder>
+  <zorder>tempSpinBox_3</zorder>
+  <zorder>labelLightOff</zorder>
+  <zorder>labelTextLight</zorder>
+  <zorder>pushButtonLight</zorder>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>pushButtonHeat</tabstop>
+  <tabstop>pushButtonCool</tabstop>
+  <tabstop>pushButtonAuto</tabstop>
+  <tabstop>pushButtonOff</tabstop>
+  <tabstop>exitSlot</tabstop>
+  <tabstop>pushButtonFanOn</tabstop>
+  <tabstop>pushButtonFanAuto</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>tempSpinBox_2</tabstop>
+  <tabstop>tempSlider</tabstop>
+  <tabstop>tempSlider_2</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>pushButtonAuto</sender>
+   <signal>clicked()</signal>
+   <receiver>tempSlider</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>653</x>
+     <y>110</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>238</x>
+     <y>756</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonAuto</sender>
+   <signal>clicked()</signal>
+   <receiver>tempSlider_2</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>664</x>
+     <y>97</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>724</x>
+     <y>760</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonHeat</sender>
+   <signal>clicked()</signal>
+   <receiver>labelTextTemp_2</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>473</x>
+     <y>117</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>194</x>
+     <y>886</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButtonCool</sender>
+   <signal>clicked()</signal>
+   <receiver>labelTextTemp_2</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>546</x>
+     <y>104</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>227</x>
+     <y>886</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <signal>tempSensor()</signal>
+ </slots>
+</ui>
