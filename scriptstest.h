@@ -37,8 +37,6 @@ private slots:
 
     void tempSensor();
 
-    void on_pushButton_clicked();
-
     void isConnected();
 
     void on_pushButtonLight_toggled(bool checked);
@@ -54,6 +52,10 @@ private slots:
     void on_tempSpinBox_valueChanged(int arg1);
 
     void update_shadow(QByteArray &newMessage, QMqttTopicName &newTopic);
+
+    void readJsonValues();
+
+    void button_update_shadow(QString &newMessage, QString &newButton);
 
 
 private:

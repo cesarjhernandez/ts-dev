@@ -103,7 +103,7 @@ ScriptsTest::ScriptsTest(QWidget *parent) :
 
     ui->pushButtonLight->setIcon(QIcon("/home/root/off_icon.png"));
     ui->pushButtonLight->setCheckable(true);
-
+/*
     ui->tempSlider->setVisible(0);
     ui->tempSlider_2->setVisible(0);
     ui->labelTempSlider->setVisible(false);
@@ -132,7 +132,7 @@ ScriptsTest::ScriptsTest(QWidget *parent) :
 
     QObject::connect(ui->tempSlider_2, SIGNAL(valueChanged(int)), ui->tempSpinBox_3, SLOT(setValue(int)));
     QObject::connect(ui->tempSpinBox_3, SIGNAL(valueChanged(int)), ui->tempSlider_2, SLOT(setValue(int)));
-
+*/
     //--- Mac Address Show
     QProcess macShow;
     macShow.start("python /home/root/mac1_read.py");
@@ -169,7 +169,6 @@ ScriptsTest::ScriptsTest(QWidget *parent) :
     ScriptsTest::tempSensor();
 
 
-
     //get IP address
     QProcess ipShow;
     ipShow.start("/home/root/getIP.sh");
@@ -187,18 +186,18 @@ ScriptsTest::ScriptsTest(QWidget *parent) :
     }
     else
     {
-        QJsonObject status, reported, mainObject;
+        QJsonObject state, reported, mainObject;
 
         mainObject.insert("temperature", int(60));
         mainObject.insert("light", QString("OFF"));
         mainObject["mode"] = "OFF";
         reported["reported"] = mainObject;
-        status["status"] = reported;
+        state["state"] = reported;
 
-        //qDebug() << reported["reported"].toObject()["status"].toObject()["mode"];
+        //qDebug() << reported["reported"].toObject()["state"].toObject()["mode"];
 
         QJsonDocument jsonDoc;
-        jsonDoc.setObject(status);
+        jsonDoc.setObject(state);
 
         QFile file("/home/root/local.json");
         if (!file.open(QIODevice::WriteOnly))
@@ -213,6 +212,10 @@ ScriptsTest::ScriptsTest(QWidget *parent) :
         stream << jsonDoc.toJson();
         file.close();
     }
+
+
+    //Update Initial JSON shadow values
+    ScriptsTest::readJsonValues();
 
 
     // MQTT Connection
@@ -528,7 +531,7 @@ ScriptsTest::~ScriptsTest()
     delete ui;
 }
 
-
+// Exit button function
 void ScriptsTest::on_exitSlot_clicked()
 {
 
@@ -551,8 +554,14 @@ void ScriptsTest::on_exitSlot_clicked()
     QApplication::quit();
 }
 
+
+// ts-dev "mode" push buttons
 void ScriptsTest::on_pushButtonOff_clicked()
 {
+    // update shadow with button press
+    QString button = "OFF";
+    QString topic = "mode";
+    ScriptsTest::button_update_shadow(button, topic);
 
     connect(ui->pushButtonOff, SIGNAL(clicked(bool)), this,SLOT(on_pushButtonOff_clicked()));
     ui->pushButtonOff->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
@@ -607,6 +616,10 @@ void ScriptsTest::on_pushButtonOff_clicked()
 
 void ScriptsTest::on_pushButtonAuto_clicked()
 {
+    // update shadow with button press
+    QString button = "AUTO";
+    QString topic = "mode";
+    ScriptsTest::button_update_shadow(button, topic);
 
     ui->pushButtonAuto->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
     ui->pushButtonFanAuto->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
@@ -654,113 +667,13 @@ void ScriptsTest::on_pushButtonAuto_clicked()
 
 }
 
-
-void ScriptsTest::on_pushButtonHeat_clicked()
-{
-
-    ui->pushButtonHeat->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
-    process3.start(shellGpioHeat);
-
-    ui->pushButtonOff->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-    ui->pushButtonCool->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-    ui->pushButtonAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-    ui->pushButtonFanAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-    ui->pushButtonFanOn->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-
-
-
-    ui->labelTextHeat_2->setText("ON");
-    ui->labelTextHeat_2->setStyleSheet("QLabel {font-weight: bold;}");
-    ui->labelTextCool_2->setText("OFF");
-    ui->labelTextCool_2->setStyleSheet("QLabel {font-weight: normal;}");
-    ui->labelTextFan_2->setText("OFF");
-    ui->labelTextFan_2->setStyleSheet("QLabel {font-weight: normal;}");
-
-    ui->tempSlider->setVisible(0);
-    ui->tempSlider_2->setVisible(0);
-
-    ui->labelSwitchAuto->setVisible(true);
-    ui->labelSwitchAuto_2->setVisible(false);
-
-    QPixmap switchAuto("/home/root/fire.svg");
-    ui->labelSwitchAuto->setPixmap(switchAuto);
-
-    ui->labelTempSlider->setText("HEAT");
-    ui->labelTempSlider->setVisible(100);
-
-    QPixmap pix("/home/root/heating2.svg");
-    ui->labelHeating->setPixmap(pix);
-
-    ui->labelTextTemp_2->setVisible(true);
-
-    ui->tempSpinBox->setVisible(true);
-
-    ui->tempSpinBox_2->setVisible(false);
-    ui->tempSpinBox_3->setVisible(false);
-
-    process2.start(shellGpioOffCool);
-    process4.start(shellGpioOffAuto);
-    process2.execute("gpio 2 0");
-    process4.execute("gpio 0 0");
-    process2.waitForFinished(-1);
-    process4.waitForFinished(-1);
-
-}
-
-
-void ScriptsTest::on_pushButtonCool_clicked()
-{
-
-    ui->pushButtonCool->setStyleSheet("QPushButton {background-color: rgb(100, 56, 233); border: none; color: white;}");
-    process2.start(shellGpioCool);
-
-    ui->pushButtonOff->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-    ui->pushButtonHeat->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-    ui->pushButtonAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-    ui->pushButtonFanAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-    ui->pushButtonFanOn->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-
-    ui->labelTextCool_2->setText("ON");
-    ui->labelTextCool_2->setStyleSheet("QLabel {font-weight: bold;}");
-    ui->labelTextFan_2->setText("OFF");
-    ui->labelTextFan_2->setStyleSheet("QLabel {font-weight: normal;}");
-    ui->labelTextHeat_2->setText("OFF");
-    ui->labelTextHeat_2->setStyleSheet("QLabel {font-weight: normal;}");
-
-    ui->tempSlider->setVisible(0);
-    ui->tempSlider_2->setVisible(0);
-
-    ui->labelTempSlider->setText("COOL");
-    ui->labelTempSlider->setVisible(100);
-
-    ui->labelSwitchAuto->setVisible(true);
-    ui->labelSwitchAuto_2->setVisible(false);
-
-    QPixmap switchAuto("/home/root/snow.svg");
-    ui->labelSwitchAuto->setPixmap(switchAuto);
-
-    QPixmap pix("/home/root/heating2.svg");
-    ui->labelHeating->setPixmap(pix);
-
-    ui->labelTextTemp_2->setVisible(true);
-
-    ui->tempSpinBox->setVisible(true);
-
-    ui->tempSpinBox_2->setVisible(false);
-    ui->tempSpinBox_3->setVisible(false);
-
-    process3.start(shellGpioOffHeat);
-    process4.start(shellGpioOffAuto);
-    process3.execute("gpio 1 0");
-    process4.execute("gpio 0 0");
-    process3.waitForFinished(-1);
-    process4.waitForFinished(-1);
-
-}
-
-
 void ScriptsTest::on_pushButtonFanAuto_clicked()
 {
+    // update shadow with button press
+    QString button = "AUTO";
+    QString topic = "mode";
+    ScriptsTest::button_update_shadow(button, topic);
+
     ui->pushButtonFanAuto->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
     ui->pushButtonAuto->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
     process4.start(shellGpioAuto);
@@ -811,6 +724,115 @@ void ScriptsTest::on_pushButtonFanAuto_clicked()
 
 }
 
+void ScriptsTest::on_pushButtonHeat_clicked()
+{
+    // update shadow with button press
+    QString button = "HEAT";
+    QString topic = "mode";
+    ScriptsTest::button_update_shadow(button, topic);
+
+    ui->pushButtonHeat->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
+    process3.start(shellGpioHeat);
+
+    ui->pushButtonOff->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+    ui->pushButtonCool->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+    ui->pushButtonAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+    ui->pushButtonFanAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+    ui->pushButtonFanOn->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+
+
+
+    ui->labelTextHeat_2->setText("ON");
+    ui->labelTextHeat_2->setStyleSheet("QLabel {font-weight: bold;}");
+    ui->labelTextCool_2->setText("OFF");
+    ui->labelTextCool_2->setStyleSheet("QLabel {font-weight: normal;}");
+    ui->labelTextFan_2->setText("OFF");
+    ui->labelTextFan_2->setStyleSheet("QLabel {font-weight: normal;}");
+
+    ui->tempSlider->setVisible(0);
+    ui->tempSlider_2->setVisible(0);
+
+    ui->labelSwitchAuto->setVisible(true);
+    ui->labelSwitchAuto_2->setVisible(false);
+
+    QPixmap switchAuto("/home/root/fire.svg");
+    ui->labelSwitchAuto->setPixmap(switchAuto);
+
+    ui->labelTempSlider->setText("HEAT");
+    ui->labelTempSlider->setVisible(100);
+
+    QPixmap pix("/home/root/heating2.svg");
+    ui->labelHeating->setPixmap(pix);
+
+    ui->labelTextTemp_2->setVisible(true);
+
+    ui->tempSpinBox->setVisible(true);
+
+    ui->tempSpinBox_2->setVisible(false);
+    ui->tempSpinBox_3->setVisible(false);
+
+    process2.start(shellGpioOffCool);
+    process4.start(shellGpioOffAuto);
+    process2.execute("gpio 2 0");
+    process4.execute("gpio 0 0");
+    process2.waitForFinished(-1);
+    process4.waitForFinished(-1);
+
+}
+
+void ScriptsTest::on_pushButtonCool_clicked()
+{
+    // update shadow with button press
+    QString button = "COOL";
+    QString topic = "mode";
+    ScriptsTest::button_update_shadow(button, topic);
+
+    ui->pushButtonCool->setStyleSheet("QPushButton {background-color: rgb(100, 56, 233); border: none; color: white;}");
+    process2.start(shellGpioCool);
+
+    ui->pushButtonOff->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+    ui->pushButtonHeat->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+    ui->pushButtonAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+    ui->pushButtonFanAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+    ui->pushButtonFanOn->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+
+    ui->labelTextCool_2->setText("ON");
+    ui->labelTextCool_2->setStyleSheet("QLabel {font-weight: bold;}");
+    ui->labelTextFan_2->setText("OFF");
+    ui->labelTextFan_2->setStyleSheet("QLabel {font-weight: normal;}");
+    ui->labelTextHeat_2->setText("OFF");
+    ui->labelTextHeat_2->setStyleSheet("QLabel {font-weight: normal;}");
+
+    ui->tempSlider->setVisible(0);
+    ui->tempSlider_2->setVisible(0);
+
+    ui->labelTempSlider->setText("COOL");
+    ui->labelTempSlider->setVisible(100);
+
+    ui->labelSwitchAuto->setVisible(true);
+    ui->labelSwitchAuto_2->setVisible(false);
+
+    QPixmap switchAuto("/home/root/snow.svg");
+    ui->labelSwitchAuto->setPixmap(switchAuto);
+
+    QPixmap pix("/home/root/heating2.svg");
+    ui->labelHeating->setPixmap(pix);
+
+    ui->labelTextTemp_2->setVisible(true);
+
+    ui->tempSpinBox->setVisible(true);
+
+    ui->tempSpinBox_2->setVisible(false);
+    ui->tempSpinBox_3->setVisible(false);
+
+    process3.start(shellGpioOffHeat);
+    process4.start(shellGpioOffAuto);
+    process3.execute("gpio 1 0");
+    process4.execute("gpio 0 0");
+    process3.waitForFinished(-1);
+    process4.waitForFinished(-1);
+
+}
 
 void ScriptsTest::on_pushButtonFanOn_clicked()
 {
@@ -861,10 +883,16 @@ void ScriptsTest::on_pushButtonFanOn_clicked()
 
 }
 
+
+// ts-dev "light" toggle button
 void ScriptsTest::on_pushButtonLight_toggled(bool checked)
 {
+    QString button = "light";
+
     if(checked)
     {
+        QString message = "ON";
+        ScriptsTest::button_update_shadow(message, button);
         ui->pushButtonLight->setIcon(QIcon("/home/root/on_icon.png"));
         ui->labelLightOn->setVisible(true);
         ui->labelLightOff->setVisible(false);
@@ -873,6 +901,8 @@ void ScriptsTest::on_pushButtonLight_toggled(bool checked)
     }
     else
     {
+        QString message = "OFF";
+        ScriptsTest::button_update_shadow(message, button);
         ui->pushButtonLight->setIcon(QIcon("/home/root/off_icon.png"));
         ui->labelLightOff->setVisible(true);
         ui->labelLightOn->setVisible(false);
@@ -881,6 +911,8 @@ void ScriptsTest::on_pushButtonLight_toggled(bool checked)
     }
 }
 
+
+// Temperature read sensor function
 void ScriptsTest::tempSensor()
 {
     QFont snFont = ui->tempLabel->font();
@@ -916,55 +948,7 @@ void ScriptsTest::tempSensor()
 }
 
 
-void ScriptsTest::on_pushButton_clicked()
-{
-
-    //get IP address
-    QProcess ipShow;
-    ipShow.start("/home/root/getIP.sh");
-    ipShow.waitForFinished(-1);
-
-    QString ipOut = ipShow.readAllStandardOutput();
-    QString ipErr = ipShow.readAllStandardError();
-
-    if (m_client->state() == QMqttClient::Disconnected) {
-        ui->pushButton->setText(tr("Disconnect"));
-        m_client->setHostname(hostName);
-        m_client->setPort(setClientPort);
-
-        m_client->connectToHost();
-        qDebug()<<"client is connected";
-        ui->pushButton->setStyleSheet("QPushButton {background-color: rgb(0, 204, 0); border: none; padding: 0 8px; border-radius: 10px; color: white}");
-
-        QPixmap switchOn("/home/root/switch.svg");
-        ui->labelSwitch->setPixmap(switchOn);
-        ui->labelSwitch->setVisible(true);
-
-        QPixmap switchOff("/home/root/switch2.svg");
-        ui->labelSwitchOff->setPixmap(switchOff);
-        ui->labelSwitchOff->setVisible(false);
-    }
-    else {
-        ui->pushButton->setText(tr("Connect"));
-        m_client->setHostname("");
-        m_client->setPort(false);
-        m_client->disconnectFromHost();
-        qDebug() << "client is disconnected";
-        ui->pushButton->setStyleSheet("QPushButton {background-color: #FF2E2E; border: none; none; padding: 0 8px; border-radius: 10px;}");
-
-        QPixmap switchOff("/home/root/switch2.svg");
-        ui->labelSwitchOff->setPixmap(switchOff);
-        ui->labelSwitchOff->setVisible(true);
-
-        QPixmap switchOn("/home/root/switch.svg");
-        ui->labelSwitch->setPixmap(switchOn);
-        ui->labelSwitch->setVisible(false);
-    }
-
-    ipShow.close();
-
-}
-
+// Subscribe to mqtt topics
 void ScriptsTest::isConnected()
 {
         QMqttTopicFilter topic;
@@ -989,6 +973,16 @@ void ScriptsTest::isConnected()
 }
 
 
+// Temperature SpinBox and Temperature Sliders
+void ScriptsTest::on_tempSpinBox_valueChanged(int arg1)
+{
+    ui->tempSpinBox_2->setValue(arg1 - 1);
+    ui->tempSlider->setValue(arg1 - 1);
+
+    ui->tempSpinBox_3->setValue(arg1 + 1);
+    ui->tempSlider_2->setValue(arg1 + 1);
+
+}
 
 void ScriptsTest::on_tempSpinBox_2_valueChanged(int arg1)
 {
@@ -996,6 +990,7 @@ void ScriptsTest::on_tempSpinBox_2_valueChanged(int arg1)
     ui->tempSlider_2->setValue(arg1 + 2);
 
     ui->tempSpinBox->setValue(arg1 + 1);
+
 }
 
 void ScriptsTest::on_tempSpinBox_3_valueChanged(int arg1)
@@ -1004,6 +999,7 @@ void ScriptsTest::on_tempSpinBox_3_valueChanged(int arg1)
     ui->tempSlider->setValue(arg1 - 2);
 
     ui->tempSpinBox->setValue(arg1 - 1);
+
 }
 
 void ScriptsTest::on_tempSlider_valueChanged(int value)
@@ -1012,8 +1008,8 @@ void ScriptsTest::on_tempSlider_valueChanged(int value)
     ui->tempSlider_2->setValue(value + 2);
 
     ui->tempSpinBox->setValue(value + 1);
-}
 
+}
 
 void ScriptsTest::on_tempSlider_2_valueChanged(int value)
 {
@@ -1021,20 +1017,11 @@ void ScriptsTest::on_tempSlider_2_valueChanged(int value)
     ui->tempSlider->setValue(value - 2);
 
     ui->tempSpinBox->setValue(value - 1);
+
 }
 
 
-void ScriptsTest::on_tempSpinBox_valueChanged(int arg1)
-{
-    ui->tempSpinBox_2->setValue(arg1 - 1);
-    ui->tempSlider->setValue(arg1 - 1);
-
-    ui->tempSpinBox_3->setValue(arg1 + 1);
-    ui->tempSlider_2->setValue(arg1 + 1);
-}
-
-
-
+// Update Shadow object values using mqtt
 void ScriptsTest::update_shadow(QByteArray &newMessage, QMqttTopicName &newTopic)
 {
 
@@ -1051,8 +1038,8 @@ void ScriptsTest::update_shadow(QByteArray &newMessage, QMqttTopicName &newTopic
     QString topic = tsDevTopic.name();
     QString mqttMessage = message;
     QJsonObject rootObject = JsonDocument.object();
-    QJsonObject status_obj = rootObject.value("status").toObject();
-    QJsonObject reported_obj = status_obj.value("reported").toObject();
+    QJsonObject state_obj = rootObject.value("state").toObject();
+    QJsonObject reported_obj = state_obj.value("reported").toObject();
     QJsonObject light_object = reported_obj.value("light").toObject();
     QJsonObject mode_object = reported_obj.value("mode").toObject();
     QJsonObject temp_object = reported_obj.value("temperature").toObject();
@@ -1080,7 +1067,7 @@ void ScriptsTest::update_shadow(QByteArray &newMessage, QMqttTopicName &newTopic
 
     QJsonObject newRoot, reported;
 
-    QJsonValueRef ref = status_obj.find("reported").value();
+    QJsonValueRef ref = state_obj.find("reported").value();
     QJsonObject m_addValue = ref.toObject();
     m_addValue.insert("light", light_value);
     m_addValue.insert("mode", mode_value);
@@ -1092,7 +1079,7 @@ void ScriptsTest::update_shadow(QByteArray &newMessage, QMqttTopicName &newTopic
     qDebug() << light_value;
 
     reported["reported"] = ref;
-    newRoot["status"] = reported;
+    newRoot["state"] = reported;
 
     JsonDocument.setObject(newRoot);
     file.open(QFile::WriteOnly | QFile::Text | QFile::Truncate);
@@ -1101,3 +1088,121 @@ void ScriptsTest::update_shadow(QByteArray &newMessage, QMqttTopicName &newTopic
     file.close();
 }
 
+
+// Read initial JSON shadow values and apply changes to QT UI
+void ScriptsTest::readJsonValues()
+{
+    // Update Local Shadow Document
+    QFile file(localShadow);
+    file.open(QIODevice::ReadWrite | QIODevice::Text);
+    QJsonParseError JsonParseError;
+    QJsonDocument JsonDocument = QJsonDocument::fromJson(file.readAll(), &JsonParseError);
+    file.close();
+
+    QJsonObject rootObject = JsonDocument.object();
+    QJsonObject state_obj = rootObject.value("state").toObject();
+    QJsonObject reported_obj = state_obj.value("reported").toObject();
+    QJsonObject light_object = reported_obj.value("light").toObject();
+    QJsonObject mode_object = reported_obj.value("mode").toObject();
+    QJsonObject temp_object = reported_obj.value("temperature").toObject();
+    QJsonValue mode_value = reported_obj.value("mode");
+    QJsonValue light_value = reported_obj.value("light");
+    QJsonValue temp_value = reported_obj.value("temperature");
+
+    int n = temp_value.toInt();
+
+    if(mode_value == "OFF")
+    {
+        ScriptsTest::on_pushButtonOff_clicked();
+    }
+    else if(mode_value == "AUTO")
+    {
+        ScriptsTest::on_pushButtonAuto_clicked();
+    }
+    else if(mode_value == "HEAT")
+    {
+        ScriptsTest::on_pushButtonHeat_clicked();
+    }
+    else if(mode_value == "COOL")
+    {
+        ScriptsTest::on_pushButtonCool_clicked();
+    }
+
+    if(light_value == "OFF")
+    {
+        ScriptsTest::on_pushButtonLight_toggled(false);
+    }
+    else if(light_value == "ON")
+    {
+        ScriptsTest::on_pushButtonLight_toggled(true);
+    }
+
+    if(n)
+    {
+        ScriptsTest::on_tempSlider_valueChanged(n);
+        ScriptsTest::on_tempSlider_2_valueChanged(n);
+        ScriptsTest::on_tempSpinBox_valueChanged(n);
+        ScriptsTest::on_tempSpinBox_2_valueChanged(n);
+        ScriptsTest::on_tempSpinBox_3_valueChanged(n);
+    }
+}
+
+
+// Update Shadow object values from QT UI buttons
+void ScriptsTest::button_update_shadow(QString &newMessage, QString &newButton)
+{
+    QString message = newMessage;
+    QString button = newButton;
+
+    QFile file(localShadow);
+    file.open(QIODevice::ReadWrite | QIODevice::Text);
+    QJsonParseError JsonParseError;
+    QJsonDocument JsonDocument = QJsonDocument::fromJson(file.readAll(), &JsonParseError);
+    file.close();
+
+    QString jsonMessage = message;
+    QJsonObject rootObject = JsonDocument.object();
+    QJsonObject state_obj = rootObject.value("state").toObject();
+    QJsonObject reported_obj = state_obj.value("reported").toObject();
+    QJsonObject light_object = reported_obj.value("light").toObject();
+    QJsonObject mode_object = reported_obj.value("mode").toObject();
+    QJsonObject temp_object = reported_obj.value("temperature").toObject();
+    QJsonValue mode_value = reported_obj.value("mode");
+    QJsonValue light_value = reported_obj.value("light");
+    QJsonValue temp_value = reported_obj.value("temperature");
+
+    if((button == "mode") && (message == "OFF" || message == "AUTO" || message == "HEAT" || message == "COOL"))
+    {
+        mode_value = jsonMessage;
+    }
+    else if((button == "light") && (message == "OFF" || message == "ON"))
+    {
+        light_value = jsonMessage;
+    }
+    else if((button == "temperature") && (jsonMessage >= "60" || jsonMessage <= "80"))
+    {
+        QString buffer = jsonMessage;
+
+        QString sizeq = buffer;
+        int size = sizeq.toInt();
+        temp_value = size;
+    }
+
+    QJsonObject newRoot, reported;
+
+    QJsonValueRef ref = state_obj.find("reported").value();
+    QJsonObject m_addValue = ref.toObject();
+    m_addValue.insert("light", light_value);
+    m_addValue.insert("mode", mode_value);
+    m_addValue.insert("temperature", temp_value);
+    ref=m_addValue;
+
+    reported["reported"] = ref;
+    newRoot["state"] = reported;
+
+    JsonDocument.setObject(newRoot);
+    file.open(QFile::WriteOnly | QFile::Text | QFile::Truncate);
+    file.write(JsonDocument.toJson());
+
+    file.close();
+}
