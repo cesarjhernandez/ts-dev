@@ -133,51 +133,25 @@ ScriptsTest::ScriptsTest(QWidget *parent) :
     QObject::connect(ui->tempSlider_2, SIGNAL(valueChanged(int)), ui->tempSpinBox_3, SLOT(setValue(int)));
     QObject::connect(ui->tempSpinBox_3, SIGNAL(valueChanged(int)), ui->tempSlider_2, SLOT(setValue(int)));
 */
-    //--- Mac Address Show
-    QProcess macShow;
-    macShow.start("python /home/root/mac1_read.py");
-    macShow.waitForFinished(-1); // will wait forever until finished
 
-    QString stdout = macShow.readAllStandardOutput();
-    QString stderr = macShow.readAllStandardError();
-
-    ui->labelMac->setText(QString("Mac: ") + stdout);
-    QFont font = ui->labelMac->font();
-    font.setPointSize(6);
-    font.setBold(true);
-    ui->labelMac->setFont(font);
-    qDebug() << ui->labelMac->text();
+    // Mac Address Show - Label
+    ScriptsTest::macShow();
 
 
     //--- Device Name Show Label
-    QProcess devShow;
-    devShow.start("/home/root/d_read.py");
-    devShow.waitForFinished(-1);
-
-    QString devOut = devShow.readAllStandardOutput();
-    QString devErr = devShow.readAllStandardError();
-
-    devOut = devOut.trimmed();
-    ui->deviceShowLabel->setText(devOut);
-    QFont snFont = ui->deviceShowLabel->font();
-    snFont.setPointSize(6);
-    snFont.setBold(true);
-    ui->deviceShowLabel->setFont(snFont);
-
+    ScriptsTest::deviceShow();
 
     // Temperature Sensor
     ScriptsTest::tempSensor();
 
+    // Van Status
+    ScriptsTest::vanDeviceStatus();
+
+    // Van LED Status
+    ScriptsTest::vanLEDStatus();
 
     //get IP address
-    QProcess ipShow;
-    ipShow.start("/home/root/getIP.sh");
-    ipShow.waitForFinished(-1);
-
-    QString ipOut = ipShow.readAllStandardOutput();
-    QString ipErr = ipShow.readAllStandardError();
-    qDebug() << ipOut;
-
+    ScriptsTest::iPShow();
 
     //local shadow
     if (QFileInfo("/home/root/local.json").exists())
@@ -219,311 +193,7 @@ ScriptsTest::ScriptsTest(QWidget *parent) :
 
 
     // MQTT Connection
-    m_client = new QMqttClient(this);
-    m_client->setHostname(hostName);
-    m_client->setPort(setClientPort);
-    m_client->connectToHost();
-    connect(m_client, &QMqttClient::connected, this,&ScriptsTest::isConnected);
-
-    connect(m_client, &QMqttClient::messageReceived, this, [this](const QByteArray &message,const QMqttTopicName &topic) {
-        const QString content = //QDateTime::currentDateTime().toString()
-                //+ QLatin1String(" Received Topic: ")
-                topic.name()
-                //+ QLatin1String(" Message: ")
-                +message;
-        //+ QLatin1Char('\n');
-
-        qDebug() << message << " " << topic;
-
-
-
-        // Alexa-AVS mode : OFF
-        if (message == "OFF" && topic.name() == "hub/sta/mode")
-        {
-            //update shadow
-            QByteArray modeOff = message;
-            QMqttTopicName topicOff = topic;
-            ScriptsTest::update_shadow(modeOff, topicOff);
-
-
-            connect(ui->pushButtonOff, SIGNAL(clicked(bool)), this,SLOT(on_pushButtonOff_clicked()));
-            ui->pushButtonOff->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
-
-
-            //Button Styles, visibility
-            ui->pushButtonAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonCool->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonHeat->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonFanAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonFanOn->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-
-            ui->labelTextCool_2->setText("OFF");
-            ui->labelTextCool_2->setStyleSheet("QLabel {font-weight: normal;}");
-            ui->labelTextFan_2->setText("OFF");
-            ui->labelTextFan_2->setStyleSheet("QLabel {font-weight: normal;}");
-            ui->labelTextHeat_2->setText("OFF");
-            ui->labelTextHeat_2->setStyleSheet("QLabel {font-weight: normal;}");
-
-            ui->tempSlider->setVisible(0);
-            ui->tempSlider_2->setVisible(0);
-
-            ui->labelTempSlider->setVisible(0);
-
-            ui->labelSwitchAuto->setVisible(false);
-            ui->labelSwitchAuto_2->setVisible(false);
-
-            ui->labelTempSlider->setVisible(false);
-
-            ui->tempSpinBox->setVisible(false);
-
-            ui->labelTextTemp_2->setVisible(false);
-
-            ui->tempSpinBox_2->setVisible(false);
-            ui->tempSpinBox_3->setVisible(false);
-
-            QPixmap pix("/home/root/heating.svg");
-            ui->labelHeating->setPixmap(pix);
-
-
-            // GPIO process, start/stop
-            process2.start(shellGpioOffCool);
-            process3.start(shellGpioOffHeat);
-            process4.start(shellGpioOffAuto);
-            process2.execute("gpio 2 0");
-            process3.execute("gpio 1 0");
-            process4.execute("gpio 0 0");
-            process2.waitForFinished(-1);
-            process3.waitForFinished(-1);
-            process4.waitForFinished(-1);
-        }
-        // Alexa-AVS mode : AUTO
-        else if (message == "AUTO" && topic.name() == "hub/sta/mode")
-        {
-            //update shadow
-            QByteArray modeAuto = message;
-            QMqttTopicName topicAuto = topic;
-            ScriptsTest::update_shadow(modeAuto, topicAuto);
-
-
-            ui->pushButtonAuto->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
-            ui->pushButtonFanAuto->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
-            process4.start(shellGpioAuto);
-
-
-            //button style, visibility
-            ui->pushButtonOff->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonCool->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonHeat->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonFanOn->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-
-            ui->labelTextFan_2->setText("ON");
-            ui->labelTextFan_2->setStyleSheet("QLabel {font-weight: bold;}");
-            ui->labelTextCool_2->setText("OFF");
-            ui->labelTextCool_2->setStyleSheet("QLabel {font-weight: normal;}");
-            ui->labelTextHeat_2->setText("OFF");
-            ui->labelTextHeat_2->setStyleSheet("QLabel {font-weight: normal;}");
-
-            ui->labelTempSlider->setText("AUTO");
-            ui->labelTempSlider->setVisible(100);
-
-            ui->tempSlider->setVisible(true);
-            ui->tempSlider_2->setVisible(true);
-
-            ui->labelSwitchAuto->setVisible(true);
-            ui->labelSwitchAuto_2->setVisible(true);
-
-            ui->tempSpinBox->setVisible(false);
-
-            ui->labelTextTemp_2->setVisible(false);
-
-            ui->tempSpinBox_2->setVisible(true);
-            ui->tempSpinBox_3->setVisible(true);
-
-
-
-            QPixmap switchAuto("/home/root/temperature.svg");
-            ui->labelSwitchAuto->setPixmap(switchAuto);
-
-            QPixmap pix("/home/root/heating2.svg");
-            ui->labelHeating->setPixmap(pix);
-
-            process2.start(shellGpioOffCool);
-            process3.start(shellGpioOffHeat);
-            process2.execute("gpio 2 0");
-            process3.execute("gpio 1 0");
-            process2.waitForFinished(-1);
-            process3.waitForFinished(-1);
-        }
-        // Alexa-AVS mode : COOL
-        else if ( message == "COOL" && topic.name() == "hub/sta/mode")
-        {
-            //update shadow
-            QByteArray modeCool = message;
-            QMqttTopicName topicCool = topic;
-            ScriptsTest::update_shadow(modeCool, topicCool);
-
-
-            ui->pushButtonCool->setStyleSheet("QPushButton {background-color: rgb(100, 56, 233); border: none; color: white;}");
-            process2.start(shellGpioCool);
-
-
-            ui->pushButtonOff->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonHeat->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonFanAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonFanOn->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-
-            ui->labelTextCool_2->setText("ON");
-            ui->labelTextCool_2->setStyleSheet("QLabel {font-weight: bold;}");
-            ui->labelTextFan_2->setText("OFF");
-            ui->labelTextFan_2->setStyleSheet("QLabel {font-weight: normal;}");
-            ui->labelTextHeat_2->setText("OFF");
-            ui->labelTextHeat_2->setStyleSheet("QLabel {font-weight: normal;}");
-
-            ui->tempSlider->setVisible(0);
-            ui->tempSlider_2->setVisible(0);
-
-            ui->labelTempSlider->setText("COOL");
-            ui->labelTempSlider->setVisible(100);
-
-            ui->labelSwitchAuto->setVisible(true);
-            ui->labelSwitchAuto_2->setVisible(false);
-
-            QPixmap switchAuto("/home/root/snow.svg");
-            ui->labelSwitchAuto->setPixmap(switchAuto);
-
-            QPixmap pix("/home/root/heating2.svg");
-            ui->labelHeating->setPixmap(pix);
-
-            ui->labelTextTemp_2->setVisible(true);
-
-            ui->tempSpinBox->setVisible(true);
-
-            ui->tempSpinBox_2->setVisible(false);
-            ui->tempSpinBox_3->setVisible(false);
-
-            process3.start(shellGpioOffHeat);
-            process4.start(shellGpioOffAuto);
-            process3.execute("gpio 1 0");
-            process4.execute("gpio 0 0");
-            process3.waitForFinished(-1);
-            process4.waitForFinished(-1);
-        }
-        // Alexa-AVS mode : Heat
-        else if ((message == "HEAT") || ((message == "{\"mode\": \"HEAT\"}") && (topic.name() == "hub/sta/mode")))
-        {
-            //update shadow
-            QByteArray modeHeat = message;
-            QMqttTopicName topicHeat = topic;
-            ScriptsTest::update_shadow(modeHeat, topicHeat);
-
-
-            ui->pushButtonHeat->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
-            process3.start(shellGpioHeat);
-
-            ui->pushButtonOff->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonCool->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonFanAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-            ui->pushButtonFanOn->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
-
-
-
-            ui->labelTextHeat_2->setText("ON");
-            ui->labelTextHeat_2->setStyleSheet("QLabel {font-weight: bold;}");
-            ui->labelTextCool_2->setText("OFF");
-            ui->labelTextCool_2->setStyleSheet("QLabel {font-weight: normal;}");
-            ui->labelTextFan_2->setText("OFF");
-            ui->labelTextFan_2->setStyleSheet("QLabel {font-weight: normal;}");
-
-            ui->tempSlider->setVisible(0);
-            ui->tempSlider_2->setVisible(0);
-
-            ui->labelSwitchAuto->setVisible(true);
-            ui->labelSwitchAuto_2->setVisible(false);
-
-            QPixmap switchAuto("/home/root/fire.svg");
-            ui->labelSwitchAuto->setPixmap(switchAuto);
-
-            ui->labelTempSlider->setText("HEAT");
-            ui->labelTempSlider->setVisible(100);
-
-            QPixmap pix("/home/root/heating2.svg");
-            ui->labelHeating->setPixmap(pix);
-
-            ui->labelTextTemp_2->setVisible(true);
-
-            ui->tempSpinBox->setVisible(true);
-
-            ui->tempSpinBox_2->setVisible(false);
-            ui->tempSpinBox_3->setVisible(false);
-
-            process2.start(shellGpioOffCool);
-            process4.start(shellGpioOffAuto);
-            process2.execute("gpio 2 0");
-            process4.execute("gpio 0 0");
-            process2.waitForFinished(-1);
-            process4.waitForFinished(-1);
-        }
-
-
-        if (message >= "60" && message <= "80" && topic.name() == "hub/sta/tempset")
-        {
-
-            QByteArray buffer = message;
-
-            QByteArray sizeq = buffer;
-            int size = sizeq.toInt();
-
-            //update shadow
-            QMqttTopicName topicHeat = topic;
-            ScriptsTest::update_shadow(buffer, topicHeat);
-
-            ui->tempSpinBox->setRange(60, 80);
-            ui->tempSpinBox->setValue(size);
-
-            ui->tempSpinBox_2->setRange(60, 80);
-            ui->tempSpinBox_2->setValue(size - 1);
-
-            ui->tempSpinBox_3->setRange(60, 80);
-            ui->tempSpinBox_3->setValue(size + 1);
-
-            ui->tempSlider->setRange(60, 80);
-            ui->tempSlider->setValue(size - 1);
-
-            ui->tempSlider_2->setRange(60, 80);
-            ui->tempSlider_2->setValue(size + 1);
-
-        }
-
-
-        if (message == "ON" && topic.name() == "hub/sta/toggle")
-        {
-            QByteArray newMessage = message;
-            QMqttTopicName topicToggleOn = topic;
-            ScriptsTest::update_shadow(newMessage, topicToggleOn);
-            ui->pushButtonLight->setIcon(QIcon("/home/root/on_icon.png"));
-            ui->labelLightOn->setVisible(true);
-            ui->labelLightOff->setVisible(false);
-
-            process.execute(shellGpioOnLight);
-
-        }
-        else if (message == "OFF" && topic.name() == "hub/sta/toggle")
-        {
-
-            QByteArray newMessage = message;
-            QMqttTopicName topicToggleOff = topic;
-            ScriptsTest::update_shadow(newMessage, topicToggleOff);
-            ui->pushButtonLight->setIcon(QIcon("/home/root/off_icon.png"));
-            ui->labelLightOff->setVisible(true);
-            ui->labelLightOn->setVisible(false);
-
-            process.execute(shellGpioOffLight);
-
-
-        }
-    });
+    ScriptsTest::mqttConnection();
 }
 
 ScriptsTest::~ScriptsTest()
@@ -939,14 +609,13 @@ void ScriptsTest::tempSensor()
         ui->tempLabel->setAlignment(Qt::AlignCenter);
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        //qDebug() << tempOut;
+        qDebug() << tempOut;
         //temp.close();
         temp.close();
     });
     timer->start(); //Call start() AFTER connect
     //Do not call start(0) since this will change interval
 }
-
 
 // Subscribe to mqtt topics
 void ScriptsTest::isConnected()
@@ -1205,4 +874,462 @@ void ScriptsTest::button_update_shadow(QString &newMessage, QString &newButton)
     file.write(JsonDocument.toJson());
 
     file.close();
+}
+
+// MQTT Connection Function
+void ScriptsTest::mqttConnection()
+{
+    m_client = new QMqttClient(this);
+    m_client->setHostname(hostName);
+    m_client->setPort(setClientPort);
+    m_client->connectToHost();
+    connect(m_client, &QMqttClient::connected, this,&ScriptsTest::isConnected);
+
+    connect(m_client, &QMqttClient::messageReceived, this, [this](const QByteArray &message,const QMqttTopicName &topic) {
+        const QString content = //QDateTime::currentDateTime().toString()
+                //+ QLatin1String(" Received Topic: ")
+                topic.name()
+                //+ QLatin1String(" Message: ")
+                +message;
+        //+ QLatin1Char('\n');
+
+        qDebug() << message << " " << topic;
+
+
+
+        // Alexa-AVS mode : OFF
+        if (message == "OFF" && topic.name() == "hub/sta/mode")
+        {
+            //update shadow
+            QByteArray modeOff = message;
+            QMqttTopicName topicOff = topic;
+            ScriptsTest::update_shadow(modeOff, topicOff);
+
+
+            connect(ui->pushButtonOff, SIGNAL(clicked(bool)), this,SLOT(on_pushButtonOff_clicked()));
+            ui->pushButtonOff->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
+
+
+            //Button Styles, visibility
+            ui->pushButtonAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonCool->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonHeat->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonFanAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonFanOn->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+
+            ui->labelTextCool_2->setText("OFF");
+            ui->labelTextCool_2->setStyleSheet("QLabel {font-weight: normal;}");
+            ui->labelTextFan_2->setText("OFF");
+            ui->labelTextFan_2->setStyleSheet("QLabel {font-weight: normal;}");
+            ui->labelTextHeat_2->setText("OFF");
+            ui->labelTextHeat_2->setStyleSheet("QLabel {font-weight: normal;}");
+
+            ui->tempSlider->setVisible(0);
+            ui->tempSlider_2->setVisible(0);
+
+            ui->labelTempSlider->setVisible(0);
+
+            ui->labelSwitchAuto->setVisible(false);
+            ui->labelSwitchAuto_2->setVisible(false);
+
+            ui->labelTempSlider->setVisible(false);
+
+            ui->tempSpinBox->setVisible(false);
+
+            ui->labelTextTemp_2->setVisible(false);
+
+            ui->tempSpinBox_2->setVisible(false);
+            ui->tempSpinBox_3->setVisible(false);
+
+            QPixmap pix("/home/root/heating.svg");
+            ui->labelHeating->setPixmap(pix);
+
+
+            // GPIO process, start/stop
+            process2.start(shellGpioOffCool);
+            process3.start(shellGpioOffHeat);
+            process4.start(shellGpioOffAuto);
+            process2.execute("gpio 2 0");
+            process3.execute("gpio 1 0");
+            process4.execute("gpio 0 0");
+            process2.waitForFinished(-1);
+            process3.waitForFinished(-1);
+            process4.waitForFinished(-1);
+        }
+        // Alexa-AVS mode : AUTO
+        else if (message == "AUTO" && topic.name() == "hub/sta/mode")
+        {
+            //update shadow
+            QByteArray modeAuto = message;
+            QMqttTopicName topicAuto = topic;
+            ScriptsTest::update_shadow(modeAuto, topicAuto);
+
+
+            ui->pushButtonAuto->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
+            ui->pushButtonFanAuto->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
+            process4.start(shellGpioAuto);
+
+
+            //button style, visibility
+            ui->pushButtonOff->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonCool->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonHeat->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonFanOn->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+
+            ui->labelTextFan_2->setText("ON");
+            ui->labelTextFan_2->setStyleSheet("QLabel {font-weight: bold;}");
+            ui->labelTextCool_2->setText("OFF");
+            ui->labelTextCool_2->setStyleSheet("QLabel {font-weight: normal;}");
+            ui->labelTextHeat_2->setText("OFF");
+            ui->labelTextHeat_2->setStyleSheet("QLabel {font-weight: normal;}");
+
+            ui->labelTempSlider->setText("AUTO");
+            ui->labelTempSlider->setVisible(100);
+
+            ui->tempSlider->setVisible(true);
+            ui->tempSlider_2->setVisible(true);
+
+            ui->labelSwitchAuto->setVisible(true);
+            ui->labelSwitchAuto_2->setVisible(true);
+
+            ui->tempSpinBox->setVisible(false);
+
+            ui->labelTextTemp_2->setVisible(false);
+
+            ui->tempSpinBox_2->setVisible(true);
+            ui->tempSpinBox_3->setVisible(true);
+
+
+
+            QPixmap switchAuto("/home/root/temperature.svg");
+            ui->labelSwitchAuto->setPixmap(switchAuto);
+
+            QPixmap pix("/home/root/heating2.svg");
+            ui->labelHeating->setPixmap(pix);
+
+            process2.start(shellGpioOffCool);
+            process3.start(shellGpioOffHeat);
+            process2.execute("gpio 2 0");
+            process3.execute("gpio 1 0");
+            process2.waitForFinished(-1);
+            process3.waitForFinished(-1);
+        }
+        // Alexa-AVS mode : COOL
+        else if ( message == "COOL" && topic.name() == "hub/sta/mode")
+        {
+            //update shadow
+            QByteArray modeCool = message;
+            QMqttTopicName topicCool = topic;
+            ScriptsTest::update_shadow(modeCool, topicCool);
+
+
+            ui->pushButtonCool->setStyleSheet("QPushButton {background-color: rgb(100, 56, 233); border: none; color: white;}");
+            process2.start(shellGpioCool);
+
+
+            ui->pushButtonOff->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonHeat->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonFanAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonFanOn->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+
+            ui->labelTextCool_2->setText("ON");
+            ui->labelTextCool_2->setStyleSheet("QLabel {font-weight: bold;}");
+            ui->labelTextFan_2->setText("OFF");
+            ui->labelTextFan_2->setStyleSheet("QLabel {font-weight: normal;}");
+            ui->labelTextHeat_2->setText("OFF");
+            ui->labelTextHeat_2->setStyleSheet("QLabel {font-weight: normal;}");
+
+            ui->tempSlider->setVisible(0);
+            ui->tempSlider_2->setVisible(0);
+
+            ui->labelTempSlider->setText("COOL");
+            ui->labelTempSlider->setVisible(100);
+
+            ui->labelSwitchAuto->setVisible(true);
+            ui->labelSwitchAuto_2->setVisible(false);
+
+            QPixmap switchAuto("/home/root/snow.svg");
+            ui->labelSwitchAuto->setPixmap(switchAuto);
+
+            QPixmap pix("/home/root/heating2.svg");
+            ui->labelHeating->setPixmap(pix);
+
+            ui->labelTextTemp_2->setVisible(true);
+
+            ui->tempSpinBox->setVisible(true);
+
+            ui->tempSpinBox_2->setVisible(false);
+            ui->tempSpinBox_3->setVisible(false);
+
+            process3.start(shellGpioOffHeat);
+            process4.start(shellGpioOffAuto);
+            process3.execute("gpio 1 0");
+            process4.execute("gpio 0 0");
+            process3.waitForFinished(-1);
+            process4.waitForFinished(-1);
+        }
+        // Alexa-AVS mode : Heat
+        else if ((message == "HEAT") || ((message == "{\"mode\": \"HEAT\"}") && (topic.name() == "hub/sta/mode")))
+        {
+            //update shadow
+            QByteArray modeHeat = message;
+            QMqttTopicName topicHeat = topic;
+            ScriptsTest::update_shadow(modeHeat, topicHeat);
+
+
+            ui->pushButtonHeat->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
+            process3.start(shellGpioHeat);
+
+            ui->pushButtonOff->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonCool->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonFanAuto->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+            ui->pushButtonFanOn->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+
+
+
+            ui->labelTextHeat_2->setText("ON");
+            ui->labelTextHeat_2->setStyleSheet("QLabel {font-weight: bold;}");
+            ui->labelTextCool_2->setText("OFF");
+            ui->labelTextCool_2->setStyleSheet("QLabel {font-weight: normal;}");
+            ui->labelTextFan_2->setText("OFF");
+            ui->labelTextFan_2->setStyleSheet("QLabel {font-weight: normal;}");
+
+            ui->tempSlider->setVisible(0);
+            ui->tempSlider_2->setVisible(0);
+
+            ui->labelSwitchAuto->setVisible(true);
+            ui->labelSwitchAuto_2->setVisible(false);
+
+            QPixmap switchAuto("/home/root/fire.svg");
+            ui->labelSwitchAuto->setPixmap(switchAuto);
+
+            ui->labelTempSlider->setText("HEAT");
+            ui->labelTempSlider->setVisible(100);
+
+            QPixmap pix("/home/root/heating2.svg");
+            ui->labelHeating->setPixmap(pix);
+
+            ui->labelTextTemp_2->setVisible(true);
+
+            ui->tempSpinBox->setVisible(true);
+
+            ui->tempSpinBox_2->setVisible(false);
+            ui->tempSpinBox_3->setVisible(false);
+
+            process2.start(shellGpioOffCool);
+            process4.start(shellGpioOffAuto);
+            process2.execute("gpio 2 0");
+            process4.execute("gpio 0 0");
+            process2.waitForFinished(-1);
+            process4.waitForFinished(-1);
+        }
+
+
+        if (message >= "60" && message <= "80" && topic.name() == "hub/sta/tempset")
+        {
+
+            QByteArray buffer = message;
+
+            QByteArray sizeq = buffer;
+            int size = sizeq.toInt();
+
+            //update shadow
+            QMqttTopicName topicHeat = topic;
+            ScriptsTest::update_shadow(buffer, topicHeat);
+
+            ui->tempSpinBox->setRange(60, 80);
+            ui->tempSpinBox->setValue(size);
+
+            ui->tempSpinBox_2->setRange(60, 80);
+            ui->tempSpinBox_2->setValue(size - 1);
+
+            ui->tempSpinBox_3->setRange(60, 80);
+            ui->tempSpinBox_3->setValue(size + 1);
+
+            ui->tempSlider->setRange(60, 80);
+            ui->tempSlider->setValue(size - 1);
+
+            ui->tempSlider_2->setRange(60, 80);
+            ui->tempSlider_2->setValue(size + 1);
+
+        }
+
+
+        if (message == "ON" && topic.name() == "hub/sta/toggle")
+        {
+            QByteArray newMessage = message;
+            QMqttTopicName topicToggleOn = topic;
+            ScriptsTest::update_shadow(newMessage, topicToggleOn);
+            ui->pushButtonLight->setIcon(QIcon("/home/root/on_icon.png"));
+            ui->labelLightOn->setVisible(true);
+            ui->labelLightOff->setVisible(false);
+
+            process.execute(shellGpioOnLight);
+
+        }
+        else if (message == "OFF" && topic.name() == "hub/sta/toggle")
+        {
+
+            QByteArray newMessage = message;
+            QMqttTopicName topicToggleOff = topic;
+            ScriptsTest::update_shadow(newMessage, topicToggleOff);
+            ui->pushButtonLight->setIcon(QIcon("/home/root/off_icon.png"));
+            ui->labelLightOff->setVisible(true);
+            ui->labelLightOn->setVisible(false);
+
+            process.execute(shellGpioOffLight);
+
+
+        }
+    });
+}
+
+// Mac Address Show Function
+void ScriptsTest::macShow()
+{
+    //--- Mac Address Show
+    QProcess macShow;
+    macShow.start("python /home/root/mac1_read.py");
+    macShow.waitForFinished(-1); // will wait forever until finished
+
+    QString stdout = macShow.readAllStandardOutput();
+    QString stderr = macShow.readAllStandardError();
+
+    ui->labelMac->setText(QString("Mac: ") + stdout);
+    QFont font = ui->labelMac->font();
+    font.setPointSize(6);
+    font.setBold(true);
+    ui->labelMac->setFont(font);
+    qDebug() << ui->labelMac->text();
+}
+
+// Device Name Show Function
+void ScriptsTest::deviceShow()
+{
+    QProcess devShow;
+    devShow.start("/home/root/d_read.py");
+    devShow.waitForFinished(-1);
+
+    QString devOut = devShow.readAllStandardOutput();
+    QString devErr = devShow.readAllStandardError();
+
+    devOut = devOut.trimmed();
+    ui->deviceShowLabel->setText(devOut);
+    QFont snFont = ui->deviceShowLabel->font();
+    snFont.setPointSize(6);
+    snFont.setBold(true);
+    ui->deviceShowLabel->setFont(snFont);
+}
+
+void ScriptsTest::iPShow()
+{
+    QProcess ipShow;
+    ipShow.start("/home/root/getIP.sh");
+    ipShow.waitForFinished(-1);
+
+    QString ipOut = ipShow.readAllStandardOutput();
+    QString ipErr = ipShow.readAllStandardError();
+    qDebug() << ipOut;
+
+}
+
+
+// VAN Functions
+
+// Van LED ON
+void ScriptsTest::on_pushButtonVanLedOn_clicked()
+{
+    ui->pushButtonVanLedOn->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
+    ui->pushButtonVanLedOff->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+
+    QStringList args {"/home/root/vanLED.py", "1"};
+    QProcess vanLedOn;
+    vanLedOn.start("python", args);
+    vanLedOn.waitForFinished();
+}
+
+// Van LED OFF
+void ScriptsTest::on_pushButtonVanLedOff_clicked()
+{
+    ui->pushButtonVanLedOff->setStyleSheet("QPushButton {background-color: rgb(100,56,233); border: none; color: white;}");
+    ui->pushButtonVanLedOn->setStyleSheet("QPushButton {background-color: rgb(224, 224, 224); border: none;}");
+
+    QStringList args {"/home/root/vanLED.py", "0"};
+    QProcess vanLedOff;
+    vanLedOff.start("python", args);
+    vanLedOff.waitForFinished();
+}
+
+// Van Device Scan
+void ScriptsTest::vanDeviceStatus()
+{
+
+    QTimer* timer = new QTimer();
+    timer->setInterval(1000); //Time in milliseconds
+
+    connect(timer, &QTimer::timeout, this, [=](){
+        QStringList args {"-m", "tinytuya", "scan", "6"};
+        QProcess vanStatus;
+        vanStatus.start("python", args);
+        vanStatus.waitForFinished();
+
+//        QJsonObject rootObject = JsonDocument.object();
+//        QJsonObject state_obj = rootObject.value("devices").toObject();
+//        qDebug() << state_obj;
+
+        QString newVanStatus = vanStatus.readAllStandardOutput();
+        QString newVanStatusError = vanStatus.readAllStandardError();
+
+        qDebug() << newVanStatus << endl;
+
+        vanStatus.close();
+
+        auto start = std::chrono::high_resolution_clock::now();
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> elapsed = end-start;
+        qDebug() << "Waited: " << elapsed.count() << "sec\n";
+
+    });
+
+    timer->start();
+}
+
+// Van LED Status
+void ScriptsTest::vanLEDStatus()
+{
+    QTimer* timer = new QTimer();
+    timer->setInterval(1000); //Time in milliseconds
+
+    connect(timer, &QTimer::timeout, this, [=](){
+        QStringList args {"/home/root/jsonReadFileTest.py", "VanLED"};
+        QProcess ledStatus;
+        ledStatus.start("python", args);
+        ledStatus.waitForFinished();
+
+        QString newLedStatus = ledStatus.readAllStandardOutput();
+
+        QStringList finalLedStatus = newLedStatus.split("\n");
+
+        QString vanLedId = finalLedStatus.value(0);
+        QString vanLedIp = finalLedStatus.value(1);
+        QString vanLedKey = finalLedStatus.value(2);
+
+        qDebug() << vanLedId << endl << vanLedIp << endl << vanLedKey << endl;
+
+        if (vanLedIp == "" || vanLedIp == "" || vanLedKey == "")
+        {
+            ui->labelTextVanStatus->setStyleSheet("QLabel {background-color: rgb(204, 0, 0); border: none; color: white;}");
+            ui->labelTextVanStatus->setText("OFFLINE");
+        }
+        else if (vanLedId == vanLedId && vanLedIp == vanLedIp && vanLedKey == vanLedKey)
+        {
+            ui->labelTextVanStatus->setStyleSheet("QLabel {background-color: rgb(0, 204, 34); border: none; color: white;}");
+            ui->labelTextVanStatus->setText("ONLINE");
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+    });
+    timer->start();
 }

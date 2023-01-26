@@ -4,7 +4,6 @@
 #include <QPixmap>
 #include <QPushButton>
 #include <QStateMachine>
-#include "switch.h"
 #include <QTextStream>
 #include <iostream>
 #include <QString>

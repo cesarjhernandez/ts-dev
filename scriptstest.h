@@ -57,6 +57,21 @@ private slots:
 
     void button_update_shadow(QString &newMessage, QString &newButton);
 
+    void on_pushButtonVanLedOn_clicked();
+
+    void on_pushButtonVanLedOff_clicked();
+
+    void macShow();
+
+    void deviceShow();
+
+    void iPShow();
+
+    void mqttConnection();
+
+    void vanDeviceStatus();
+
+    void vanLEDStatus();
 
 private:
     Ui::ScriptsTest *ui;
